@@ -24,8 +24,9 @@ def find_repo_root(start_dir: Path) -> Path | None:
 def list_source_files(source_dir: Path, project_root: Path) -> Iterator[Path]:
     for dirpath, dirnames, filenames in source_dir.walk():
         for filename in filenames:
-            filepath = dirpath / filename
-            yield filepath.relative_to(project_root)
+            filepath = (dirpath / filename).resolve()
+            if filepath.is_file():
+                yield filepath.relative_to(project_root)
 
 
 def process_file(
