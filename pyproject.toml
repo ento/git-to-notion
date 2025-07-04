@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "git-to-notion"
+version = "0.1.0"
+license = "MIT"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.2.1,<9.0.0",
+    "pygit2>=1.18.0,<2.0.0",
+]
+
+[project.scripts]
+git-to-notion = "git_to_notion.cli:cli"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1,<9.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
+
+[tool.uv]
+add-bounds = "major"

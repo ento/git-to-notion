@@ -1,0 +1,19 @@
+{
+  "name": "notion-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@vrerv/md-to-notion": "https://github.com/ento/md-to-notion.git#staged",
+    "concat-stream": "^2.0.0",
+    "remark-gemoji": "^8.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "to-vfile": "^8.0.0",
+    "unified": "^11.0.5"
+  },
+  "resolutions": {
+    "@tryfabric/martian": "https://github.com/ento/martian.git#02dedc2827e084be8343ab5740d0f5a2cbb05f2a"
+  }
+}

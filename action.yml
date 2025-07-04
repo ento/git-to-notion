@@ -1,0 +1,83 @@
+name: 'Git to Notion'
+description: 'Sync markdown files managed by Git to Notion'
+inputs:
+  source-dir:
+    description: 'Directory in a Git repo to sync to Notion'
+    required: true
+  notion-token:
+    description: 'Notion API token'
+    required: true
+  page-id:
+    description: 'ID of Notion page to use as the sync destination'
+    required: true
+  git-url-base:
+    description: 'Base URL of web UI for browsing Git files'
+  git-ref:
+    description: 'Git ref to use when formatting links to edit or view history'
+runs:
+  using: "composite"
+  steps:
+    - name: Set globals
+      id: globals
+      shell: bash
+      run: |
+        uv_cache_dir=${{ github.action_path }}/.uv
+        echo "uv_cache_dir=$uv_cache_dir" >> "${GITHUB_OUTPUT}"
+
+        npm_cache_dir=${{ github.action_path }}/.npm
+        echo "npm_cache_dir=$npm_cache_dir" >> "${GITHUB_OUTPUT}"
+
+        abs_source_dir=$(readlink -e "$SOURCE_DIR")
+        echo "abs_source_dir=$abs_source_dir" >> "${GITHUB_OUTPUT}"
+
+        source_dir_hash=($(echo "$abs_source_dir"| md5sum))
+        build_dir=${{ github.action_path }}/.build/$source_dir_hash
+        echo "build_dir=$build_dir" >> "${GITHUB_OUTPUT}"
+      env:
+        SOURCE_DIR: ${{ inputs.source-dir }}
+    - name: Set up uv cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.globals.outputs.uv_cache_dir }}
+        key: ${{ runner.os }}-sync-to-notion-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-sync-to-notion-uv-
+    - name: Set up npm cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.globals.outputs.npm_cache_dir }}
+        key: ${{ runner.os }}-sync-to-notion-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-sync-to-notion-npm-
+    - name: Install Node dependencies
+      run: |
+        npm ci --cache ${{ steps.globals.outputs.npm_cache_dir }}
+      shell: devenv shell -- bash -xe {0}
+      working-directory: ${{ github.action_path }}
+      env:
+        UV_CACHE_DIR: ${{ steps.globals.outputs.uv_cache_dir }}
+    - name: Build
+      run: |
+        git-to-notion build "$SOURCE_DIR" "$BUILD_DIR" \
+          ${GIT_URL_BASE:+--git-url-base "$GIT_URL_BASE"} \
+          ${GIT_PROVIDER:+--git-provider "$GIT_PROVIDER"} \
+          ${GIT_REF:+--git-ref "$GIT_REF"}
+      shell: devenv shell -- bash -xe {0}
+      working-directory: ${{ github.action_path }}
+      env:
+        SOURCE_DIR: ${{ steps.globals.outputs.abs_source_dir }}
+        BUILD_DIR: ${{ steps.globals.outputs.build_dir }}
+        GIT_URL_BASE: ${{ inputs.git-url-base }}
+        GIT_PROVIDER: ${{ inputs.git-provider }}
+        GIT_REF: ${{ inputs.git-ref }}
+        UV_CACHE_DIR: ${{ steps.globals.outputs.uv_cache_dir }}
+    - name: Sync
+      run: |
+        git-to-notion sync "$BUILD_DIR"
+      shell: devenv shell -- bash -xe {0}
+      working-directory: ${{ github.action_path }}
+      env:
+        BUILD_DIR: ${{ steps.globals.outputs.build_dir }}
+        NOTION_PAGE_ID: ${{ inputs.page-id }}
+        NOTION_TOKEN: ${{ inputs.notion-token }}
+        UV_CACHE_DIR: ${{ steps.globals.outputs.uv_cache_dir }}
