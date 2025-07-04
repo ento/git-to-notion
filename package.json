@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@vrerv/md-to-notion": "https://github.com/ento/md-to-notion.git#staged",
+    "@vrerv/md-to-notion": "https://github.com/ento/md-to-notion.git#86efea4d19568cb36beeb2803aab30044595c166",
     "concat-stream": "^2.0.0",
     "remark-gemoji": "^8.0.0",
     "remark-parse": "^11.0.0",
@@ -13,7 +13,7 @@
     "to-vfile": "^8.0.0",
     "unified": "^11.0.5"
   },
-  "resolutions": {
+  "overrides": {
     "@tryfabric/martian": "https://github.com/ento/martian.git#02dedc2827e084be8343ab5740d0f5a2cbb05f2a"
   }
 }
