@@ -40,9 +40,9 @@ def test_sync(tmp_path, runner):
 
         assert result.exit_code == 0, result.output
         assert mock_execvp.call_args.args == (
-            "md-to-notion",
+            "node_modules/.bin/md-to-notion",
             [
-                "md-to-notion",
+                "node_modules/.bin/md-to-notion",
                 "--timeout",
                 "30000",
                 str(build_dir),

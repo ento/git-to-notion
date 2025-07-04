@@ -127,8 +127,9 @@ def build(source_dir, build_dir, git_url_base, git_provider, git_ref, preprocess
 @click.argument("build_dir", type=click.Path(file_okay=False, writable=True))
 @click.option("-p", "--notion-page-id", required=True, envvar="NOTION_PAGE_ID")
 @click.option("-t", "--notion-token", required=True, envvar="NOTION_TOKEN")
-def sync(build_dir: Path, notion_page_id: str, notion_token: str):
-    command = ["md-to-notion"]
+@click.option("--md-to-notion", default="node_modules/.bin/md-to-notion")
+def sync(build_dir: Path, notion_page_id: str, notion_token: str, md_to_notion: str):
+    command = [md_to_notion]
     flags = [
         "--timeout",
         "30000",
@@ -139,7 +140,7 @@ def sync(build_dir: Path, notion_page_id: str, notion_token: str):
         notion_page_id,
         "-d",
     ]
-    os.execvp("md-to-notion", command + flags)
+    os.execvp(md_to_notion, command + flags)
 
 
 if __name__ == "__main__":
