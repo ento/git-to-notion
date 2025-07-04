@@ -1,0 +1,26 @@
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: cachix/install-nix-action@v23
+      - uses: cachix/cachix-action@v14
+        with:
+          name: devenv
+      - run: nix profile install nixpkgs#devenv
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          source-dir: .
+          notion-token: ${{ secrets.SMOKE_TEST_NOTION_TOKEN }}
+          page-id: ${{ secrets.SMOKE_TEST_NOTION_PAGE_ID }}
+          git-url-base: https://github.com/ento/git-to-notion/
