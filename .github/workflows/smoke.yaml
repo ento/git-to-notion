@@ -26,3 +26,4 @@ jobs:
           notion-token: ${{ secrets.SMOKE_TEST_NOTION_TOKEN }}
           page-id: ${{ secrets.SMOKE_TEST_NOTION_PAGE_ID }}
           git-url-base: https://github.com/ento/git-to-notion/
+          cachix-pull-names: ento-git-to-notion-ci

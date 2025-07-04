@@ -14,6 +14,8 @@ inputs:
     description: 'Base URL of web UI for browsing Git files'
   git-ref:
     description: 'Git ref to use when formatting links to edit or view history'
+  cachix-pull-names:
+    description: 'Names of Cachix caches to pull from'
 runs:
   using: "composite"
   steps:
@@ -49,6 +51,13 @@ runs:
         key: ${{ runner.os }}-sync-to-notion-npm-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-sync-to-notion-npm-
+    - name: Set up .env
+      run: |
+        echo CACHIX_PULL_NAMES=$CACHIX_PULL_NAMES > .env
+      shell: bash
+      env:
+        CACHIX_PULL_NAMES: ${{ inputs.cachix-pull-names }}
+      working-directory: ${{ github.action_path }}
     - name: Install Node dependencies
       run: |
         npm ci --cache ${{ steps.globals.outputs.npm_cache_dir }}

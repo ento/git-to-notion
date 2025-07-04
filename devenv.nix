@@ -44,7 +44,11 @@ in
   git-hooks.hooks.ruff.enable = true;
   git-hooks.hooks.ruff-format.enable = true;
 
-  dotenv.disableHint = true;
+  cachix.pull = lib.optionals
+    (lib.hasAttr "CACHIX_PULL_NAMES" config.env)
+    (lib.splitString " " config.env.CACHIX_PULL_NAMES);
+
+  dotenv.enable = true;
   env.LD_LIBRARY_PATH = lib.makeLibraryPath (with pkgs; [
     zlib
   ]);
