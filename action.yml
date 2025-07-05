@@ -14,8 +14,14 @@ inputs:
     description: 'Base URL to use when generating links to edit or view history'
   git-ref:
     description: 'Git ref to use when formatting links to edit or view history'
-  cachix-pull-names:
-    description: 'Names of Cachix caches to pull from'
+    default: 'HEAD'
+  setup-devenv:
+    description: 'Whether to install Nix and devenv'
+    default: 'true'
+  cachix-name:
+    description: 'Name of custom Cachix cache to use'
+  cachix-auth-token:
+    description: 'Set an auth token to push to cachix-pull-name'
 runs:
   using: "composite"
   steps:
@@ -37,6 +43,23 @@ runs:
         echo "build_dir=$build_dir" >> "${GITHUB_OUTPUT}"
       env:
         SOURCE_DIR: ${{ inputs.source-dir }}
+    - uses: cachix/install-nix-action@v23
+      if: inputs.setup-devenv == 'true'
+    - name: Set up Cachix (custom)
+      uses: cachix/cachix-action@v14
+      if: inputs.setup-devenv == 'true' && inputs.cachix-name
+      with:
+        name: ${{ inputs.cachix-name }}
+        authToken: '${{ inputs.cachix-auth-token }}'
+        extraPullNames: devenv
+    - name: Set up Cachix (default)
+      uses: cachix/cachix-action@v14
+      if: inputs.setup-devenv == 'true' && !inputs.cachix-name
+      with:
+        name: devenv
+    - run: nix profile install nixpkgs#devenv
+      if: inputs.setup-devenv == 'true'
+      shell: bash
     - name: Set up uv cache
       uses: actions/cache@v4
       with:
@@ -52,11 +75,12 @@ runs:
         restore-keys: |
           ${{ runner.os }}-sync-to-notion-npm-
     - name: Set up .env
+      if: inputs.cachix-pull-name
       run: |
         echo CACHIX_PULL_NAMES=$CACHIX_PULL_NAMES > .env
       shell: bash
       env:
-        CACHIX_PULL_NAMES: ${{ inputs.cachix-pull-names }}
+        CACHIX_PULL_NAMES: ${{ inputs.cachix-pull-name }}
       working-directory: ${{ github.action_path }}
     - name: Install Node dependencies
       run: |

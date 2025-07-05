@@ -8,9 +8,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  main:
+  with-external-devenv:
     runs-on: ubuntu-latest
-
     steps:
       - uses: cachix/install-nix-action@v23
       - uses: cachix/cachix-action@v14
@@ -26,4 +25,19 @@ jobs:
           notion-token: ${{ secrets.SMOKE_TEST_NOTION_TOKEN }}
           page-id: ${{ secrets.SMOKE_TEST_NOTION_PAGE_ID }}
           git-url-base: https://github.com/ento/git-to-notion/
-          cachix-pull-names: ento-git-to-notion-ci
+          setup-devenv: false
+          cachix-name: ento-git-to-notion-ci
+
+  with-internal-devenv:
+    needs: [with-external-devenv]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          source-dir: test/smoke-docs
+          notion-token: ${{ secrets.SMOKE_TEST_NOTION_TOKEN }}
+          page-id: ${{ secrets.SMOKE_TEST_NOTION_PAGE_ID }}
+          git-url-base: https://github.com/ento/git-to-notion/
+          cachix-name: ento-git-to-notion-ci
+          cachix-auth-token: '${{ secrets.CACHIX_AUTH_TOKEN }}'
