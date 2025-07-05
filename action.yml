@@ -2,7 +2,7 @@ name: 'Git to Notion'
 description: 'Sync markdown files managed by Git to Notion'
 inputs:
   source-dir:
-    description: 'Directory in a Git repo to sync to Notion'
+    description: 'Directory to sync to Notion'
     required: true
   notion-token:
     description: 'Notion API token'
@@ -11,7 +11,7 @@ inputs:
     description: 'ID of Notion page to use as the sync destination'
     required: true
   git-url-base:
-    description: 'Base URL of web UI for browsing Git files'
+    description: 'Base URL to use when generating links to edit or view history'
   git-ref:
     description: 'Git ref to use when formatting links to edit or view history'
   cachix-pull-names:
