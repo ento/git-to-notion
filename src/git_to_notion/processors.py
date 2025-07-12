@@ -36,9 +36,9 @@ class PathTemplateContext(TypedDict):
 
 PATH_TEMPLATES_BY_PROVIDER: dict[GitProvider, PathTemplates] = {
     GitProvider.GITHUB: {
-        "edit_path": "/blob/{ref}/{filepath}",
-        "history_path": "/commits/{ref}/{filepath}",
-        "commit_path": "/commit/{last_commit}",
+        "edit_path": "blob/{ref}/{filepath}",
+        "history_path": "commits/{ref}/{filepath}",
+        "commit_path": "commit/{last_commit}",
     }
 }
 
