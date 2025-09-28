@@ -1,0 +1,2 @@
+- newlines become hard newlines in Notion
+- new pages don't get sorted
