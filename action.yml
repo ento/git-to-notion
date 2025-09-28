@@ -43,10 +43,10 @@ runs:
         echo "build_dir=$build_dir" >> "${GITHUB_OUTPUT}"
       env:
         SOURCE_DIR: ${{ inputs.source-dir }}
-    - uses: cachix/install-nix-action@v23
+    - uses: cachix/install-nix-action@v31
       if: inputs.setup-devenv == 'true'
     - name: Set up Cachix (custom)
-      uses: cachix/cachix-action@v14
+      uses: cachix/cachix-action@v16
       if: inputs.setup-devenv == 'true' && inputs.cachix-name
       with:
         name: ${{ inputs.cachix-name }}
