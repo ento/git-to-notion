@@ -11,8 +11,8 @@ jobs:
   with-external-devenv:
     runs-on: ubuntu-latest
     steps:
-      - uses: cachix/install-nix-action@v23
-      - uses: cachix/cachix-action@v14
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
         with:
           name: ento-git-to-notion-ci
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
