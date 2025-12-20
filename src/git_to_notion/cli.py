@@ -24,7 +24,7 @@ def find_repo_root(start_dir: Path) -> Path | None:
 
 def list_source_files(
     source_dir: Path, project_root: Path, gitignore_path: Path | None
-) -> Iterator[Path]:
+) -> Iterator[tuple[Path, Path]]:
     should_ignore = None
     if gitignore_path:
         should_ignore = parse_gitignore(gitignore_path)
@@ -33,7 +33,16 @@ def list_source_files(
             filepath = dirpath / filename
             if should_ignore and should_ignore(filepath):
                 continue
-            yield filepath.relative_to(project_root)
+
+            content_path = filepath
+            if filepath.is_symlink():
+                content_path = filepath.resolve()
+                if not (
+                    content_path.is_file() and content_path.is_relative_to(project_root)
+                ):
+                    continue
+
+            yield filepath.relative_to(project_root), content_path
 
 
 def process_file(
@@ -41,7 +50,7 @@ def process_file(
     ctx: BuildContext,
     preprocessors: Sequence[processors.Builtin | processors.External],
 ) -> bytes:
-    content = path_info.absolute_source_path.read_bytes()
+    content = path_info.absolute_content_path.read_bytes()
     for processor in preprocessors:
         match processor:
             case processors.Builtin():
@@ -102,7 +111,6 @@ def build(
         build_dir=build_dir,
         project_root=project_root,
         repo=Repository(str(repo_root)) if repo_root else None,
-        gitignore_path=gitignore_path,
         git_url_base=git_url_base,
         git_provider=git_provider,
         git_ref=git_ref,
@@ -128,10 +136,12 @@ def build(
             preprocessors_by_extension[param.copy_from_ext]
         )
 
-    for project_relative_path in list_source_files(
-        source_dir, ctx.project_root, ctx.gitignore_path
+    for project_relative_path, absolute_content_path in list_source_files(
+        source_dir, ctx.project_root, gitignore_path
     ):
-        path_info = ctx.get_source_path_info(source_dir, project_relative_path)
+        path_info = ctx.get_source_path_info(
+            source_dir, project_relative_path, absolute_content_path
+        )
         ext = project_relative_path.suffix.lstrip(".")
 
         click.secho(f"processing: {project_relative_path}")

@@ -48,6 +48,31 @@ def test_build_with_gitignore(tmp_path, runner):
     assert not (build_dir / "TODO.md").exists()
 
 
+def test_build_with_symlinks(tmp_path, runner):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+
+    (source_dir / "README.md").write_text("Welcome! :star:")
+    (source_dir / "ignored_file_a.md").write_text("ignored_a")
+    (source_dir / "ignored_file_b.md").write_text("ignored_b")
+    (source_dir / "included_symlink_to_ignored_file").symlink_to("ignored_file_a.md")
+    (source_dir / "ignored_symlink").symlink_to("ignored_file_b.md")
+    (source_dir / ".gitignore").write_text(
+        "\n".join(["ignored_file*", "ignored_symlink*"])
+    )
+
+    build_dir = tmp_path / "build"
+
+    result = runner.invoke(cli, ["build", str(source_dir), str(build_dir)])
+
+    assert result.exit_code == 0, result.output
+
+    assert (build_dir / "README.md").is_file()
+    assert not (build_dir / "ignored_file_a.md").exists()
+    assert not (build_dir / "ignored_file_b.md").exists()
+    assert (build_dir / "included_symlink_to_ignored_file").read_text() == "ignored_a"
+
+
 def test_sync(tmp_path, runner):
     build_dir = tmp_path / "build"
 

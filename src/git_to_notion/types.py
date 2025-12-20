@@ -13,6 +13,7 @@ class GitProvider(enum.Enum):
 class PathInfo:
     project_relative_path: Path
     absolute_source_path: Path
+    absolute_content_path: Path
     absolute_build_path: Path
 
 
@@ -21,13 +22,12 @@ class BuildContext:
     build_dir: Path
     project_root: Path
     repo: Repository | None
-    gitignore_path: Path | None
     git_url_base: str | None
     git_provider: GitProvider
     git_ref: str
 
     def get_source_path_info(
-        self, source_dir: Path, project_relative_path: Path
+        self, source_dir: Path, project_relative_path: Path, absolute_content_path: Path
     ) -> PathInfo:
         absolute_source_path = self.project_root / project_relative_path
         relative_source_path = absolute_source_path.relative_to(source_dir)
@@ -35,5 +35,6 @@ class BuildContext:
         return PathInfo(
             project_relative_path=project_relative_path,
             absolute_source_path=absolute_source_path,
+            absolute_content_path=absolute_content_path,
             absolute_build_path=absolute_build_path,
         )
