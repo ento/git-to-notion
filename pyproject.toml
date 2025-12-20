@@ -9,6 +9,7 @@ license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
     "click>=8.2.1,<9.0.0",
+    "gitignore-parser>=0.1.13,<0.2.0",
     "pygit2>=1.18.0,<2.0.0",
 ]
 
