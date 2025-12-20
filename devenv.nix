@@ -1,7 +1,6 @@
 # See full reference at https://devenv.sh/reference/options/
 { pkgs, lib, config, inputs, ... }:
 let
-  pkgs-unstable = import inputs.nixpkgs-unstable { system = pkgs.stdenv.system; };
   # Workaround for https://github.com/cachix/devenv/issues/1678
   pyright = (
     (pkgs.writeShellApplication {
@@ -29,7 +28,6 @@ in
   languages.python.enable = true;
   languages.python.version = "3.13";
   languages.python.uv.enable = true;
-  languages.python.uv.package = pkgs-unstable.uv;
   languages.python.uv.sync.enable = true;
   languages.python.uv.sync.arguments = ["--frozen"];
   languages.python.venv.enable = true;
