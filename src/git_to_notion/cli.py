@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Iterator
 
 import click
+from gitignore_parser import parse_gitignore
 from pygit2.repository import Repository
 
 from . import processors
@@ -21,10 +22,17 @@ def find_repo_root(start_dir: Path) -> Path | None:
     return current_dir.absolute().resolve()
 
 
-def list_source_files(source_dir: Path, project_root: Path) -> Iterator[Path]:
+def list_source_files(
+    source_dir: Path, project_root: Path, gitignore_path: Path | None
+) -> Iterator[Path]:
+    should_ignore = None
+    if gitignore_path:
+        should_ignore = parse_gitignore(gitignore_path)
     for dirpath, dirnames, filenames in source_dir.walk():
         for filename in filenames:
             filepath = dirpath / filename
+            if should_ignore and should_ignore(filepath):
+                continue
             yield filepath.relative_to(project_root)
 
 
@@ -64,6 +72,7 @@ def cli():
     "build_dir",
     type=click.Path(file_okay=False, writable=True, resolve_path=True, path_type=Path),
 )
+@click.option("--gitignore/--no-gitignore", default=True)
 @click.option("--git-url-base")
 @click.option(
     "--git-provider",
@@ -78,13 +87,22 @@ def cli():
     default=processors.DEFAULT_STACK,
     type=processors.ProcessorParamType(),
 )
-def build(source_dir, build_dir, git_url_base, git_provider, git_ref, preprocess):
+def build(
+    source_dir, build_dir, gitignore, git_url_base, git_provider, git_ref, preprocess
+):
     repo_root = find_repo_root(source_dir)
+    project_root = repo_root or source_dir
+
+    gitignore_path = None
+    if gitignore:
+        if project_root.joinpath(".gitignore").is_file():
+            gitignore_path = project_root.joinpath(".gitignore")
 
     ctx = BuildContext(
         build_dir=build_dir,
-        project_root=repo_root or source_dir,
+        project_root=project_root,
         repo=Repository(str(repo_root)) if repo_root else None,
+        gitignore_path=gitignore_path,
         git_url_base=git_url_base,
         git_provider=git_provider,
         git_ref=git_ref,
@@ -110,7 +128,9 @@ def build(source_dir, build_dir, git_url_base, git_provider, git_ref, preprocess
             preprocessors_by_extension[param.copy_from_ext]
         )
 
-    for project_relative_path in list_source_files(source_dir, ctx.project_root):
+    for project_relative_path in list_source_files(
+        source_dir, ctx.project_root, ctx.gitignore_path
+    ):
         path_info = ctx.get_source_path_info(source_dir, project_relative_path)
         ext = project_relative_path.suffix.lstrip(".")
 

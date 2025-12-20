@@ -21,6 +21,7 @@ class BuildContext:
     build_dir: Path
     project_root: Path
     repo: Repository | None
+    gitignore_path: Path | None
     git_url_base: str | None
     git_provider: GitProvider
     git_ref: str
