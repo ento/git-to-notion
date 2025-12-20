@@ -8,11 +8,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: cachix/install-nix-action@v23
-      - uses: cachix/cachix-action@v14
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
         with:
           name: devenv
       - run: nix profile install nixpkgs#devenv
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: devenv shell -- npm ci
       - run: devenv test
