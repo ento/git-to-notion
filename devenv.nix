@@ -24,6 +24,7 @@ in
   packages = [
     pkgs.nodejs
     pkgs.python3
+    pkgs.uv
   ];
 
   languages.python.uv.enable = true;
