@@ -105,9 +105,7 @@
     "nixpkgs-python": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_2"
       },
       "locked": {
         "lastModified": 1765052656,
@@ -119,6 +117,21 @@
       "original": {
         "owner": "cachix",
         "repo": "nixpkgs-python",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1766014764,
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2b0d2b456e4e8452cf1c16d00118d145f31160f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-25.05",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
