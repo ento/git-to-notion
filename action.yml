@@ -52,7 +52,7 @@ runs:
     - name: Install Node dependencies
       run: |
         npm ci --cache ${{ steps.globals.outputs.npm_cache_dir }}
-      shell: devenv --verbose --log-format tracing-pretty shell -- bash -xe {0}
+      shell: devenv --verbose shell -- bash -xe {0}
       working-directory: ${{ github.action_path }}
       env:
         UV_CACHE_DIR: ${{ steps.globals.outputs.uv_cache_dir }}
