@@ -23,11 +23,11 @@ in
 {
   packages = [
     pkgs.nodejs
+    pkgs.python3
   ];
 
-  languages.python.enable = true;
-  languages.python.version = "3.13";
   languages.python.uv.enable = true;
+  languages.python.uv.package = pkgs.uv;
   languages.python.uv.sync.enable = true;
   languages.python.uv.sync.arguments = ["--frozen"];
   languages.python.venv.enable = true;

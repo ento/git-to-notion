@@ -54,7 +54,7 @@ runs:
       run: |
         npm ci --cache ${{ steps.globals.outputs.npm_cache_dir }}
         echo "$(pwd)/node_modules/.bin" >> "$GITHUB_PATH"
-      shell: devenv --verbose shell -- bash -xe {0}
+      shell: devenv shell -- bash -xe {0}
       working-directory: ${{ github.action_path }}
       env:
         UV_CACHE_DIR: ${{ steps.globals.outputs.uv_cache_dir }}
