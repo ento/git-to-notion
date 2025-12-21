@@ -30,8 +30,9 @@ runs:
         abs_source_dir=$(readlink -e "$SOURCE_DIR")
         echo "abs_source_dir=$abs_source_dir" >> "${GITHUB_OUTPUT}"
 
-        source_dir_hash=($(echo "$abs_source_dir"| md5sum))
-        build_dir=${{ github.action_path }}/.build/$source_dir_hash
+        source_dir_hash=$(echo "$abs_source_dir"| md5sum)
+        cd "${{ github.action_path }}"
+        build_dir="$(pwd)/.build/$source_dir_hash"
         echo "build_dir=$build_dir" >> "${GITHUB_OUTPUT}"
       env:
         SOURCE_DIR: ${{ inputs.source-dir }}
@@ -52,6 +53,7 @@ runs:
     - name: Install Node dependencies
       run: |
         npm ci --cache ${{ steps.globals.outputs.npm_cache_dir }}
+        echo "$(pwd)/node_modules/.bin" >> "$GITHUB_PATH"
       shell: devenv --verbose shell -- bash -xe {0}
       working-directory: ${{ github.action_path }}
       env:
